@@ -61,6 +61,7 @@ async function processDocumentAsync(documentId: string) {
 
     // 步骤 2: AI 解析
     try {
+      console.log("OCR Result:", ocrResult);
       const detectedType = document.documentType === "other"
         ? (await detectDocumentType(ocrResult.mdResults)).type
         : document.documentType;

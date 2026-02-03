@@ -223,7 +223,7 @@ export async function ocrFromUrl(fileUrl: string): Promise<{
 }> {
   console.log("OCR from URL:", fileUrl);
   const response = await glmOcrService.parseFromUrl(fileUrl);
-
+  console.log(response);
   const layoutDetails = GlmOcrService.normalizeLayoutDetails(
     response.layout_details
   );
