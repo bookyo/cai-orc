@@ -73,7 +73,7 @@ export interface LayoutDetail {
   index: number;
   label: string;
   bbox_2d: [number, number, number, number];
-  content: string;
+  content?: string; // 改为可选
   height: number;
   width: number;
   page?: number;

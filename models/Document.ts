@@ -49,7 +49,7 @@ const LayoutDetailSchema = new Schema<LayoutDetail>(
         message: "bbox_2d must have exactly 4 elements",
       },
     },
-    content: { type: String, required: true },
+    content: { type: String }, // 改为可选
     height: { type: Number, required: true },
     width: { type: Number, required: true },
     page: { type: Number },
