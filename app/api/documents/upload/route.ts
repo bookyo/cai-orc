@@ -10,6 +10,8 @@ import { Document, AuditLog } from "@/models";
 import { env } from "@/lib/env";
 import { saveFile } from "@/lib/storage/fileStorage";
 import { requirePermission } from "@/lib/permission";
+import { ocrFromUrl } from "@/lib/services/glmOcr";
+import { parseByType, detectDocumentType } from "@/lib/services/glmParser";
 
 /**
  * 验证文件类型
@@ -23,6 +25,65 @@ function validateFileType(mimeType: string): boolean {
  */
 function validateFileSize(size: number): boolean {
   return size <= env.maxFileSize;
+}
+
+/**
+ * 异步处理文档
+ */
+async function processDocumentAsync(documentId: string) {
+  try {
+    const document = await Document.findById(documentId);
+    if (!document) return;
+
+    // 步骤 1: OCR 识别
+    let ocrResult;
+    try {
+      ocrResult = await ocrFromUrl(document.fileUrl);
+      await document.updateOcrResult({
+        mdResults: ocrResult.mdResults,
+        layoutDetails: ocrResult.layoutDetails,
+        numPages: ocrResult.numPages,
+      });
+    } catch (error: any) {
+      await document.updateStatus("failed", {
+        message: error.message,
+        stage: "ocr",
+      });
+      await AuditLog.log(
+        documentId,
+        document.fileName,
+        "reparse",
+        { stage: "ocr_failed", error: error.message }
+      );
+      return;
+    }
+
+    // 步骤 2: AI 解析
+    try {
+      const detectedType = document.documentType === "other"
+        ? (await detectDocumentType(ocrResult.mdResults)).type
+        : document.documentType;
+
+      const result = await parseByType(ocrResult.mdResults, detectedType);
+      const parsedData = { [detectedType]: result };
+
+      await document.updateParsedData(parsedData, detectedType);
+    } catch (error: any) {
+      await document.updateStatus("failed", {
+        message: error.message,
+        stage: "ai_parse",
+      });
+      await AuditLog.log(
+        documentId,
+        document.fileName,
+        "reparse",
+        { stage: "ai_parse_failed", error: error.message }
+      );
+      return;
+    }
+  } catch (error: any) {
+    console.error("Document processing error:", error);
+  }
 }
 
 /**
@@ -102,6 +163,11 @@ export async function POST(request: NextRequest) {
       "upload",
       { fileSize: file.size, fileType: file.type }
     );
+
+    // 自动触发处理（异步，不阻塞响应）
+    processDocumentAsync(document._id.toString()).catch((error) => {
+      console.error("Background processing error:", error);
+    });
 
     return NextResponse.json(
       {

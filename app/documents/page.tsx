@@ -92,6 +92,18 @@ export default function DocumentsPage() {
     fetchDocuments();
   }, [page, documentType, status]);
 
+  // 轮询处理中的文档
+  useEffect(() => {
+    const hasProcessingDocs = documents.some(doc => doc.status === "processing");
+    if (!hasProcessingDocs) return;
+
+    const interval = setInterval(() => {
+      fetchDocuments();
+    }, 3000); // 每3秒刷新一次
+
+    return () => clearInterval(interval);
+  }, [documents]);
+
   /**
    * 搜索处理
    */
