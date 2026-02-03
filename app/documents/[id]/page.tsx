@@ -23,11 +23,32 @@ import {
   Phone,
   Mail,
   MapPin,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime, formatCurrency } from "@/lib/utils";
+
+/**
+ * 下载文件
+ */
+async function downloadFile(url: string, filename: string) {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
+}
 
 /**
  * 发票详情组件
@@ -360,6 +381,39 @@ export default function DocumentDetailPage() {
     }
   };
 
+  /**
+   * 导出文档
+   */
+  const handleExport = async (doc: any) => {
+    try {
+      const res = await fetch("/api/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          documentIds: [params.id],
+          format: "json",
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // 下载导出的 JSON 文件
+        const jsonStr = JSON.stringify(data.data.documents[0], null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${doc.fileName}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error("Failed to export:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -417,7 +471,10 @@ export default function DocumentDetailPage() {
                 <RefreshCw className={`h-4 w-4 mr-2 ${reprocessing ? "animate-spin" : ""}`} />
                 重新识别
               </Button>
-              <Button variant="outline">
+              <Button
+                variant="outline"
+                onClick={() => handleExport(document)}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 导出
               </Button>
@@ -551,6 +608,35 @@ export default function DocumentDetailPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* 原图预览 */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center">
+              <ImageIcon className="h-4 w-4 mr-2" />
+              原图预览
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="group relative inline-block w-full">
+              <img
+                src={document.fileUrl}
+                alt={document.fileName}
+                className="w-full h-auto rounded-lg border border-gray-200"
+              />
+              {/* 悬停时显示的下载按钮 */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                <Button
+                  onClick={() => downloadFile(document.fileUrl, document.fileName)}
+                  className="bg-white text-gray-900 hover:bg-gray-100"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  下载原图
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );
