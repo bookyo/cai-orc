@@ -23,6 +23,7 @@ export interface IDocument {
   documentType: DocumentType;
   uploadDate: Date;
   status: DocumentStatus;
+  filePath?: string; // 文件存储路径
 
   // OCR 结果
   ocrResult?: {

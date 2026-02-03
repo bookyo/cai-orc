@@ -38,6 +38,7 @@ async function processDocumentAsync(documentId: string) {
     // 步骤 1: OCR 识别
     let ocrResult;
     try {
+      // 直接使用 fileUrl 进行 OCR
       ocrResult = await ocrFromUrl(document.fileUrl);
       await document.updateOcrResult({
         mdResults: ocrResult.mdResults,
@@ -151,6 +152,7 @@ export async function POST(request: NextRequest) {
       documentType: documentType || "other",
       uploadDate: new Date(),
       status: "processing",
+      filePath: uploadedFile.path, // 直接存储文件路径
       metadata: {
         fileSize: file.size,
       },

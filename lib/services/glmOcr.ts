@@ -78,6 +78,10 @@ export class GlmOcrService {
    */
   async parse(options: GlmOcrOptions): Promise<GlmOcrResponse> {
     try {
+      console.log("GLM-OCR API request:", {
+        model: options.model || "GLM-OCR",
+        file: options.file,
+      });
       const response = await axios.post<GlmOcrResponse>(
         this.apiUrl,
         {
@@ -217,6 +221,7 @@ export async function ocrFromUrl(fileUrl: string): Promise<{
   numPages: number;
   confidence: number;
 }> {
+  console.log("OCR from URL:", fileUrl);
   const response = await glmOcrService.parseFromUrl(fileUrl);
 
   const layoutDetails = GlmOcrService.normalizeLayoutDetails(

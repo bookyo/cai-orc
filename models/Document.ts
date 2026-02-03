@@ -249,6 +249,8 @@ const DocumentSchema = new Schema<IDocument>(
     },
 
     error: ErrorSchema,
+
+    filePath: { type: String }, // 文件存储路径
   },
   {
     timestamps: true,
@@ -263,6 +265,9 @@ const DocumentSchema = new Schema<IDocument>(
     },
   }
 );
+
+// 添加 filePath 索引
+DocumentSchema.index({ filePath: 1 });
 
 /**
  * 索引定义
