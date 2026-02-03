@@ -173,10 +173,12 @@ export class GlmOcrService {
     const groups: Record<string, string> = {};
 
     layoutDetails.flat().forEach((item) => {
-      if (!groups[item.label]) {
-        groups[item.label] = "";
+      if (item?.label && item?.content) {
+        if (!groups[item.label]) {
+          groups[item.label] = "";
+        }
+        groups[item.label] += item.content + "\n";
       }
-      groups[item.label] += item.content + "\n";
     });
 
     // 转换为数组格式
@@ -198,7 +200,7 @@ export class GlmOcrService {
     // 这里可以根据实际返回的数据计算置信度
     // 目前返回一个基于内容长度的简单估算
     const totalContentLength = allItems.reduce(
-      (sum, item) => sum + item.content.length,
+      (sum, item) => sum + (item?.content?.length || 0),
       0
     );
 
