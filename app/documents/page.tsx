@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -242,10 +243,13 @@ export default function DocumentsPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Link href="/">
-                <div className="p-2 bg-primary rounded-lg">
-                  <FileText className="h-6 w-6 text-primary-foreground" />
-                </div>
+                <Button variant="ghost" size="icon">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
               </Link>
+              <div className="p-2 bg-primary rounded-lg">
+                <FileText className="h-6 w-6 text-primary-foreground" />
+              </div>
               <div>
                 <h1 className="text-xl font-bold">文档列表</h1>
                 <p className="text-sm text-muted-foreground">共 {total} 个文档</p>

@@ -22,7 +22,7 @@ export async function GET(
 ) {
   try {
     const { filename } = await params;
-
+    
     // 安全检查：防止目录遍历
     if (!filename || filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
       return new NextResponse("Invalid filename", { status: 400 });
@@ -39,7 +39,7 @@ export async function GET(
 
     // 读取文件
     const fileBuffer = await fs.readFile(filePath);
-
+    
     // 确定 Content-Type
     const ext = path.extname(filename).toLowerCase();
     const contentType = MIME_TYPES[ext] || "application/octet-stream";

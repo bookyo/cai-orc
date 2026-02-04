@@ -5,7 +5,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings as SettingsIcon, Save, Eye, EyeOff } from "lucide-react";
+import { Settings as SettingsIcon, Save, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,6 +172,11 @@ export default function SettingsPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              <Link href="/">
+                <Button variant="ghost" size="icon">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
               <div className="p-2 bg-primary rounded-lg">
                 <SettingsIcon className="h-6 w-6 text-primary-foreground" />
               </div>

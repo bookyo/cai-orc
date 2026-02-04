@@ -25,8 +25,8 @@ import { formatFileSize } from "@/lib/utils";
  * 文档类型选项
  */
 const DOCUMENT_TYPES = [
-  { value: "other", label: "自动识别" },
   { value: "invoice", label: "发票" },
+  { value: "other", label: "自动识别" },
   { value: "certificate", label: "证书" },
   { value: "resume", label: "简历" },
   { value: "handwritten", label: "手写笔记" },
@@ -44,7 +44,7 @@ type UploadStatus = "idle" | "uploading" | "success" | "error";
 export default function UploadPage() {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
-  const [documentType, setDocumentType] = useState("other");
+  const [documentType, setDocumentType] = useState("invoice");
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
