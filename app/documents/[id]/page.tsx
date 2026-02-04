@@ -390,16 +390,15 @@ export default function DocumentDetailPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          documentIds: [params.id],
+          ids: [params.id],
           format: "json",
         }),
       });
 
       if (res.ok) {
-        const data = await res.json();
-        // 下载导出的 JSON 文件
-        const jsonStr = JSON.stringify(data.data.documents[0], null, 2);
-        const blob = new Blob([jsonStr], { type: "application/json" });
+        const text = await res.text();
+        // API 直接返回 JSON 字符串，直接使用
+        const blob = new Blob([text], { type: "application/json" });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
